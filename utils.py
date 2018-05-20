@@ -45,17 +45,19 @@ class tank:
         self.trig_pin.on()
         sleep_ms(10)
         self.trig_pin.off()
+        rise = 0
+        fall = 0
 
         # Wait for echo pin to go high
         while not self.echo_pin.value():
             rise = ticks_us()
 
-        # Wait for echo pin to go low
-        while self.echo_pin.value():
+        # Wait for echo pin to go low or timeout after 11ms (2meters)
+        while self.echo_pin.value() and fall-rise < 12000:
             fall = ticks_us()
 
         # math the diff for distance in cm
-        self.current_level_cm = ticks_diff(fall, rise)/2/29
+        self.current_level_cm = (fall - rise)/58
 
         # return that in %
         self.current_level = self.current_level_cm/self.depth*100
