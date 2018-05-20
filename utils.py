@@ -2,6 +2,7 @@ import time
 from machine import Pin, Timer
 from utime import ticks_diff, ticks_us, sleep_ms
 
+
 def log(line):
     '{} - {}'.format(time.localtime(), line)
 

@@ -58,35 +58,46 @@ def run_api():
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(addr)
     s.listen(5)
-    http_response = "HTTP/1.0 200 OK\r\n\r\n{}"
+    #http_response = "HTTP/1.0 200 OK\r\n\r\n{}"
 
     while True:
         res = s.accept()
         client_s = res[0]
         client_addr = res[1]
-        req = client_s.recv(4096)
-        request = req.split('GET /')[1].split(' HTTP/')[0]
-        client_s.send(
-            {
-                "pump/top": pump_top,
-                "pump/bot": pump_bot,
-                "pump/top/": pump_top,
-                "pump/bot/": pump_bot,
-                "stop": allstop,
-                "status": lambda unused: str(status)
-            }.get(request)(level)
-        )
+        req = str(client_s.recv(4096)).split('GET /')[1].split(' HTTP/')[0]
+        level = 0
+        try:
+            client_s.send(
+                str({
+                    'resp': {
+                        "pump/top": pump_top,
+                        "pump/bot": pump_bot,
+                        "pump/top/": pump_top,
+                        "pump/bot/": pump_bot,
+                        "stop": allstop,
+                        "status": lambda **x: str(status)
+                     }.get(req, lambda **x: 'NEHP')(target=level)
+                 })
+            )
+        except Exception as e:
+            print(e)
         client_s.close()
 
 # Stahp!
 allstop()
+init_timers()
 
 # Tie above fn buttons to tank fill functions
 f1.irq(trigger=f1.IRQ_FALLING, handler=pump_top)
 f2.irq(trigger=f2.IRQ_FALLING, handler=pump_bot)
 f3.irq(trigger=f3.IRQ_FALLING, handler=allstop)
 
-try:
-    ntptime.settime()
-    run_api()
-except
+
+while True:
+    try:
+        # TODO @mrmoje, implement ntp (when there is a route to the internets)
+        # after logging is implemented
+        # ntptime.settime()
+        run_api()
+    except:
+        addr = None
