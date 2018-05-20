@@ -21,7 +21,7 @@ f3 = Pin(9, Pin.IN, Pin.PULL_UP)
 
 # Some inits
 OLED = sh1106_i2c.Display(
-    I2C(-1, sda=pin(SDA), scl=pin(SCL), freq=400000)
+    I2C(-1, sda=SDA, scl=SCL, freq=400000)
 )
 
 display_timer = Timer(1)
