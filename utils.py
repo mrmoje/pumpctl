@@ -1,5 +1,6 @@
 import time
 from machine import Pin, Timer
+from utime import ticks_diff, ticks_us, sleep_ms
 
 def log(line):
     '{} - {}'.format(time.localtime(), line)
@@ -38,8 +39,9 @@ class tank:
 
     def get_level(self):
         # 10ms HC-SR04 trigger signal
+        self.trig_pin.off()
         self.trig_pin.on()
-        utime.sleep_ms(10)
+        sleep_ms(10)
         self.trig_pin.off()
 
         # Wait for echo pin to go high
