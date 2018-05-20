@@ -4,6 +4,7 @@ from config import OLED, PUMP, top_tank, bot_tank, display_timer, f1, f2, f3
 from utils import log
 
 status = {}
+addr = None
 
 def allstop(unused=None):
     global status
@@ -27,11 +28,19 @@ def pump_bot(unused=None, target_level=100):
 
 def display_update(timer):
     global status, addr
-    tank = top_tank if top_tank.valve_pin.value() else bot_tank
+    if status['JOB'] is not 'IDLE':
+        tank = top_tank if top_tank.valve_pin.value() else bot_tank
+        status.update({
+            'QTY': '%d%%' % tank.current_level,
+            'AIM': '%d%%' % tank.target_level,
+            'RUN': '%d%%' % tank.target_level
+        })
+    status['ADR'] = addr
     OLED.fb.fill(0)
-    row = 0
-    for k, v in status.items():
-        OLED.fb.text('{} :- {}'.format(k, v), 0, row, 1)
+    OLED.fb.text('JOB:- {}'.format(status['JOB']), 0, 0, 1)
+    row = 10
+    for k in ['QTY', 'AIM', 'TIME', 'ADR']:
+        OLED.fb.text('{}: {}'.format(k, status.get(k)), 0, row, 1)
         row += 10
     OLED.update()
 
@@ -42,8 +51,8 @@ def init_timers():
     )
 
 # WEB API served by simplistic http
-def run_api()
-    global status
+def run_api():
+    global status, addr
     s = socket.socket()
     addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
