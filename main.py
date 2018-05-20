@@ -1,5 +1,5 @@
 import ntptime, usocket as socket
-
+from machine import Timer
 from config import OLED, PUMP, top_tank, bot_tank, display_timer, f1, f2, f3
 from utils import log
 
