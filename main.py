@@ -6,27 +6,33 @@ from utils import log
 status = {}
 addr = None
 
-def allstop(unused=None):
+def allstop(*args, **kwargs):
     global status
     status = {'JOB': 'IDLE'}
     top_tank.stop()
     bot_tank.stop()
-    display_timer.init(
+    display_timer.deinit()
+    display_update()
+    return "OK"
 
 
-def pump_top(unused=None, target_level=100):
+def pump_top(*args, **kwargs):
     global status
+    allstop()
     status = {'JOB': 'TOP TANK'}
-    top_tank.pump(target_level)
+    top_tank.pump(target_level=kwargs.get('target', 100))
     init_timers()
+    return "OK"
 
-def pump_bot(unused=None, target_level=100):
+def pump_bot(*args, **kwargs):
     global status
-    status = {'JOB': 'BOTTOM TANK'}
-    bot_tank.pump(target_level)
+    allstop()
+    status = {'JOB': 'BOT. TANK'}
+    bot_tank.pump(target_level=kwargs.get('target', 100))
     init_timers()
+    return "OK"
 
-def display_update(timer):
+def display_update(unused=None):
     global status, addr
     if status['JOB'] is not 'IDLE':
         tank = top_tank if top_tank.valve_pin.value() else bot_tank
