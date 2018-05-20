@@ -15,6 +15,7 @@ class tank:
         self.trig_pin = trig_pin
         self.depth = depth # in CM
         self.level_monitor_timer = Timer(2)
+        self.target_level = 100
         self.get_level()
 
     def fill(self, unused=None):
@@ -30,7 +31,7 @@ class tank:
             callback=self.monitor)
         self.valve_pin.on()
         # 3 seconds to let valve settle
-        utime.sleep(3)
+        sleep_ms(3000)
         self.pump_pin.on()
 
     def stop(self):
